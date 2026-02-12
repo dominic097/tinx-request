@@ -1,10 +1,12 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 interface MainLayoutProps {
   children: ReactNode;
+  sidebar?: ReactNode;
+  statusBar?: ReactNode;
 }
 
-export function MainLayout({ children }: MainLayoutProps) {
+export function MainLayout({ children, sidebar, statusBar }: MainLayoutProps) {
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden">
       {/* Activity Bar - Left Side */}
@@ -15,14 +17,11 @@ export function MainLayout({ children }: MainLayoutProps) {
       </div>
 
       {/* Sidebar Panel */}
-      <div className="w-64 bg-card border-r border-border flex flex-col">
-        <div className="h-12 border-b border-border flex items-center px-4">
-          <h2 className="font-semibold text-sm">Collections</h2>
+      {sidebar && (
+        <div className="w-64 bg-card border-r border-border flex flex-col">
+          {sidebar}
         </div>
-        <div className="flex-1 overflow-auto">
-          {/* Sidebar content will go here */}
-        </div>
-      </div>
+      )}
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
@@ -33,12 +32,16 @@ export function MainLayout({ children }: MainLayoutProps) {
 
         {/* Status Bar */}
         <div className="h-6 bg-primary text-primary-foreground px-4 flex items-center justify-between text-xs">
-          <div className="flex items-center gap-4">
-            <span>Ready</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <span>No Environment</span>
-          </div>
+          {statusBar || (
+            <>
+              <div className="flex items-center gap-4">
+                <span>Ready</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <span>No Environment</span>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

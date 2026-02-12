@@ -1,5 +1,6 @@
 import { db } from './db';
-import { Request, HttpMethod } from '@/types';
+import type { Request } from '@/types';
+import { HttpMethod } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
 export const requestService = {

@@ -1,5 +1,5 @@
 import { db } from './db';
-import { Collection, Folder } from '@/types';
+import type { Collection } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
 export const collectionService = {
@@ -19,8 +19,6 @@ export const collectionService = {
       id: uuidv4(),
       name,
       description,
-      requests: [],
-      folders: [],
       variables: [],
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -44,23 +42,5 @@ export const collectionService = {
     
     // Delete the collection
     await db.collections.delete(id);
-  },
-
-  async addFolder(collectionId: string, folder: Folder): Promise<void> {
-    const collection = await db.collections.get(collectionId);
-    if (collection) {
-      collection.folders.push(folder);
-      collection.updatedAt = new Date();
-      await db.collections.put(collection);
-    }
-  },
-
-  async removeFolder(collectionId: string, folderId: string): Promise<void> {
-    const collection = await db.collections.get(collectionId);
-    if (collection) {
-      collection.folders = collection.folders.filter(f => f.id !== folderId);
-      collection.updatedAt = new Date();
-      await db.collections.put(collection);
-    }
   },
 };

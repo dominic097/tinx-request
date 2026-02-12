@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Collection } from '@/types';
+import type { Collection } from '@/types';
 import { collectionService } from '@/lib/storage';
 
 interface CollectionsState {
@@ -16,7 +16,7 @@ interface CollectionsState {
   selectCollection: (id: string | null) => void;
 }
 
-export const useCollectionsStore = create<CollectionsState>((set, get) => ({
+export const useCollectionsStore = create<CollectionsState>((set) => ({
   collections: [],
   selectedCollectionId: null,
   isLoading: false,

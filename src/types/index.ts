@@ -1,40 +1,46 @@
 // HTTP Methods
-export enum HttpMethod {
-  GET = 'GET',
-  POST = 'POST',
-  PUT = 'PUT',
-  PATCH = 'PATCH',
-  DELETE = 'DELETE',
-  HEAD = 'HEAD',
-  OPTIONS = 'OPTIONS',
-}
+export const HttpMethod = {
+  GET: 'GET',
+  POST: 'POST',
+  PUT: 'PUT',
+  PATCH: 'PATCH',
+  DELETE: 'DELETE',
+  HEAD: 'HEAD',
+  OPTIONS: 'OPTIONS',
+} as const;
+
+export type HttpMethod = typeof HttpMethod[keyof typeof HttpMethod];
 
 // Request Body Types
-export enum BodyType {
-  NONE = 'none',
-  JSON = 'json',
-  XML = 'xml',
-  TEXT = 'text',
-  HTML = 'html',
-  JAVASCRIPT = 'javascript',
-  FORM_DATA = 'form-data',
-  URL_ENCODED = 'x-www-form-urlencoded',
-  BINARY = 'binary',
-  GRAPHQL = 'graphql',
-}
+export const BodyType = {
+  NONE: 'none',
+  JSON: 'json',
+  XML: 'xml',
+  TEXT: 'text',
+  HTML: 'html',
+  JAVASCRIPT: 'javascript',
+  FORM_DATA: 'form-data',
+  URL_ENCODED: 'x-www-form-urlencoded',
+  BINARY: 'binary',
+  GRAPHQL: 'graphql',
+} as const;
+
+export type BodyType = typeof BodyType[keyof typeof BodyType];
 
 // Authentication Types
-export enum AuthType {
-  NONE = 'none',
-  BASIC = 'basic',
-  BEARER = 'bearer',
-  API_KEY = 'api-key',
-  OAUTH1 = 'oauth1',
-  OAUTH2 = 'oauth2',
-  HAWK = 'hawk',
-  AWS_SIGNATURE = 'aws-signature',
-  NTLM = 'ntlm',
-}
+export const AuthType = {
+  NONE: 'none',
+  BASIC: 'basic',
+  BEARER: 'bearer',
+  API_KEY: 'api-key',
+  OAUTH1: 'oauth1',
+  OAUTH2: 'oauth2',
+  HAWK: 'hawk',
+  AWS_SIGNATURE: 'aws-signature',
+  NTLM: 'ntlm',
+} as const;
+
+export type AuthType = typeof AuthType[keyof typeof AuthType];
 
 // Header
 export interface Header {
@@ -145,8 +151,6 @@ export interface Folder {
   description?: string;
   collectionId: string;
   parentId?: string;
-  requests: Request[];
-  folders: Folder[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -166,8 +170,6 @@ export interface Collection {
   id: string;
   name: string;
   description?: string;
-  requests: Request[];
-  folders: Folder[];
   variables: Variable[];
   auth?: AuthConfig;
   preRequestScript?: string;
@@ -199,8 +201,6 @@ export interface Workspace {
   id: string;
   name: string;
   description?: string;
-  collections: Collection[];
-  environments: Environment[];
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;

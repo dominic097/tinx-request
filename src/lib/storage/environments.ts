@@ -1,5 +1,5 @@
 import { db } from './db';
-import { Environment, Variable } from '@/types';
+import type { Environment, Variable } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
 export const environmentService = {

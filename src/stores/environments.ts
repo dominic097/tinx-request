@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Environment } from '@/types';
+import type { Environment } from '@/types';
 import { environmentService } from '@/lib/storage';
 
 interface EnvironmentsState {
@@ -16,7 +16,7 @@ interface EnvironmentsState {
   setActiveEnvironment: (id: string) => Promise<void>;
 }
 
-export const useEnvironmentsStore = create<EnvironmentsState>((set, get) => ({
+export const useEnvironmentsStore = create<EnvironmentsState>((set) => ({
   environments: [],
   activeEnvironment: null,
   isLoading: false,

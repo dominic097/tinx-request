@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { Request, HttpMethod } from '@/types';
+import type { Request } from '@/types';
+import { HttpMethod } from '@/types';
 import { requestService } from '@/lib/storage';
 
 interface RequestsState {
@@ -20,7 +21,7 @@ interface RequestsState {
   setActiveTab: (id: string) => void;
 }
 
-export const useRequestsStore = create<RequestsState>((set, get) => ({
+export const useRequestsStore = create<RequestsState>((set) => ({
   requests: [],
   openTabs: [],
   activeTabId: null,
