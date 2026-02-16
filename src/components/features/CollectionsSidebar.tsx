@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCollectionsStore } from '@/stores/collections';
 import { useRequestsStore } from '@/stores/requests';
 import type { Request } from '@/types';
 import { HttpMethod } from '@/types';
+import { importFromPostman, readFile } from '@/lib/importExport';
 
 interface CollectionsSidebarProps {
   onSelectRequest: (request: Request) => void;
@@ -15,6 +16,7 @@ export function CollectionsSidebar({ onSelectRequest, onNewRequest }: Collection
   const [isCreating, setIsCreating] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
   const [expandedCollections, setExpandedCollections] = useState<Set<string>>(new Set());
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
     collections,
@@ -25,7 +27,7 @@ export function CollectionsSidebar({ onSelectRequest, onNewRequest }: Collection
     selectCollection,
   } = useCollectionsStore();
 
-  const { requests, fetchRequests } = useRequestsStore();
+  const { requests, fetchRequests, createRequest } = useRequestsStore();
 
   useEffect(() => {
     fetchCollections();
@@ -49,6 +51,73 @@ export function CollectionsSidebar({ onSelectRequest, onNewRequest }: Collection
     if (confirm('Delete this collection and all its requests?')) {
       await deleteCollection(id);
     }
+  };
+
+  const handleImportFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.name.endsWith('.json')) {
+      alert('Please select a JSON file');
+      return;
+    }
+
+    try {
+      const content = await readFile(file);
+      const data = JSON.parse(content);
+      
+      // Validate Postman collection format
+      if (!data.info || !data.item) {
+        alert('Invalid Postman collection format. The file must contain "info" and "item" properties.');
+        return;
+      }
+
+      // Validate Postman schema
+      const validSchemas = [
+        'https://schema.getpostman.com/json/collection/v2.0.0/collection.json',
+        'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
+      ];
+      
+      if (data.info.schema && !validSchemas.includes(data.info.schema)) {
+        alert(`Unsupported Postman collection version. Supported versions: v2.0.0, v2.1.0`);
+        return;
+      }
+
+      // Import Postman collection
+      const { collection, requests: importedRequests } = importFromPostman(content);
+      const newCollection = await createCollection(
+        collection.name || 'Imported Collection',
+        collection.description
+      );
+      
+      for (const req of importedRequests) {
+        await createRequest(
+          req.name || 'Untitled Request',
+          req.method as any,
+          req.url || '',
+          newCollection.id
+        );
+      }
+      
+      alert(`Successfully imported ${importedRequests.length} request${importedRequests.length !== 1 ? 's' : ''} from Postman collection "${collection.name}"`);
+    } catch (error) {
+      console.error('Failed to import file:', error);
+      if (error instanceof SyntaxError) {
+        alert('Invalid JSON file. Please ensure the file contains valid JSON.');
+      } else {
+        alert('Failed to import Postman collection. Please check the file format.');
+      }
+    } finally {
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
   };
 
   const toggleCollection = (id: string) => {
@@ -103,8 +172,26 @@ export function CollectionsSidebar({ onSelectRequest, onNewRequest }: Collection
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </button>
+          <button
+            onClick={handleImportClick}
+            className="p-1 hover:bg-secondary rounded"
+            title="Import Postman Collection (JSON)"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+          </button>
         </div>
       </div>
+
+      {/* Hidden File Input */}
+      <input
+        ref={fileInputapplication/json
+        type="file"
+        accept=".json,.yaml,.yml"
+        onChange={handleImportFile}
+        className="hidden"
+      />
 
       {/* New Collection Input */}
       {isCreating && (
